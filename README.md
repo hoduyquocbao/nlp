@@ -1570,7 +1570,7 @@ OK
 Tôi đã bắt đầu quá trình học và đề xuất cải tiến mã nguồn. Đây là danh sách các đề xuất của tôi cho module ml:
 
 - Sử dụng `#[derive(Debug, Clone, PartialEq)]` cho các kiểu dữ liệu `Model`, `Layer`, `Activation`, và `Loss` để có thể in ra, sao chép, và so sánh các giá trị của chúng một cách dễ dàng.
-- Thay thế các phép tính ma trận bằng các phương thức của thư viện `ndarray` để tăng hiệu năng và đơn giản hóa mã nguồn. Ví dụ: `dot_product`, `transpose`, `add`, `subtract`, `multiply`, `divide`, `sigmoid`, `relu`, `softmax`, `mse`, `cross_entropy`.
+- Thay thế các phép tính ma trận bằng các phương thức của thư viện `ndarray` để tăng hiệu năng và đơn giản hóa mã nguồn. Ví dụ: `dot_product`, `transpose`, `add`, `subtract`, `multiply`, `divide`, `sigmoid`, `relu`, `softmax`, `mse`, `cross_entropy`.      
 - Sử dụng các kiểu dữ liệu `Option` và `Result` để xử lý các trường hợp lỗi hoặc không xác định, thay vì sử dụng các giá trị mặc định hoặc bỏ qua. Ví dụ: `forward`, `backward`, `train`, `predict`.
 - Viết các chú thích và tài liệu cho các hàm, phương thức, và kiểu dữ liệu để giải thích mục đích, đầu vào, đầu ra, và thuật toán của chúng. Sử dụng các ký hiệu như `///` và `//!` để tạo tài liệu có thể truy cập bằng công cụ `cargo doc`.
 - Định dạng lại mã nguồn theo các quy ước của Rust, bao gồm cách sử dụng các khoảng trắng, dấu ngoặc, dấu phẩy, và dòng mới. Sử dụng công cụ `cargo fmt` để tự động định dạng mã nguồn.
@@ -1767,3 +1767,35 @@ impl Model {
     }
 }
 
+// Implement the methods for the Model struct
+impl Model {
+
+    // Add a layer to the model
+    pub fn add_layer(&mut self, layer: Layer) {
+        self.layers.push(layer);
+    }
+
+    // Get a reference to a layer by its index
+    pub fn get_layer(&self, index: usize) -> Option<&Layer> {
+        self.layers.get(index)
+    }
+
+    // Save the model to a file
+    pub fn save(&self, file: &str) -> Result<(), Box<dyn std::error::Error>> {
+        // Use serde to serialize the model to JSON
+        let json = serde_json::to_string(self)?;
+        // Write the JSON string to the file
+        std::fs::write(file, json)?;
+        Ok(())
+    }
+
+    // Load the model from a file
+    pub fn load(file: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        // Read the file as a JSON string
+        let json = std::fs::read_to_string(file)?;
+        // Use serde to deserialize the JSON string to a model
+        let model = serde_json::from_str(&json)?;
+        Ok(model)
+    }
+}
+```
